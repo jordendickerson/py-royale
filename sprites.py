@@ -17,7 +17,12 @@ class KingTower(pg.sprite.Sprite):
         self.pos = vec(x, y)
         self.rect.center = (self.pos)
 
-        self.hp = 1000
+        self.hp = KING_HP
+
+    def update(self):
+        #kill if hp runs out
+        if self.hp <= 0:
+            self.kill()
 
 class ArcherTower(pg.sprite.Sprite):
     def __init__(self, game, x, y, group):
@@ -30,7 +35,12 @@ class ArcherTower(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.pos = vec(x, y)
         self.rect.center = (self.pos)
-        self.hp = 500
+        self.hp = ARCHER_HP
+
+    def update(self):
+        #kill if hp runs out
+        if self.hp <= 0:
+            self.kill()
 
 class Troop(pg.sprite.Sprite):
     def __init__(self, game, x, y, group):
@@ -46,9 +56,10 @@ class Troop(pg.sprite.Sprite):
         self.acc = vec(0,0)
         self.rect.center = (self.pos)
 
-        self.hp = 100
-        self.damage = 50
+        self.hp = TROOP_HP
+        self.damage = TROOP_DAMAGE
         self.target = None
+        self.timeSince = 0
 
 
 
@@ -56,24 +67,47 @@ class Troop(pg.sprite.Sprite):
     def calcDistance(self):
         towers = []
         towerDist = []
+        #go through every tower in the enemy towers group
         for tower in self.enemyTowers:
             dist = math.sqrt((self.pos.x - tower.pos.x)**2 + (self.pos.y - tower.pos.y)**2)
-            towerDist.append(dist)
-            towers.append(tower)
-        # if king tower is closest
-        if towerDist[0] < towerDist[1] and towerDist[2]:
-            self.target = towers[0]
-        # if left tower is closest
-        elif towerDist[1] < towerDist[0] and towerDist[2]:
-            self.target = towers[1]
-        # if right tower is closest
-        elif towerDist[2] < towerDist[0] and towerDist[1]:
-            self.target = towers[2]
+            towerDist.append(dist) #append the distance from the tower to the tower distance list
+            towers.append(tower) #append the tower to the towers list
+        try:
+            #find the index of closest tower in towers list
+            minIndex = towerDist.index(min(towerDist))
+            #set target to the minIndex from towers
+            self.target = towers[minIndex]
+        except:
+            print('no')
+    #attack target if colliding
+    def attackTarget(self):
+        hits = pg.sprite.spritecollide(self, self.game.enemyTowers, False)
+        if hits:
+            self.target.hp -= self.damage
+            print(self.target.hp)
 
     def update(self):
         self.calcDistance()
-        if self.pos.x > self.target.pos.x:
-            self.pos.x -= TROOP_SPEED
-        if self.pos.y > (self.target.pos.y + (self.target.width / 1.5)):
-            self.pos.y -= TROOP_SPEED
-        self.rect.center = self.pos
+        hits = pg.sprite.spritecollide(self, self.enemyTowers, False)
+        if not hits:
+            #move troop if not at tower x
+            if self.pos.x != self.target.pos.x:
+                #check which side of the tower it is on
+                if self.pos.x > self.target.pos.x:
+                    self.pos.x -= TROOP_SPEED
+                else:
+                    self.pos.x += TROOP_SPEED
+            #move troop if not at tower y
+            if self.pos.y != self.target.pos.y:
+                # check which side of the tower it is on
+                if self.pos.y > self.target.pos.y:
+                    self.pos.y -= TROOP_SPEED
+                else:
+                    self.pos.y += TROOP_SPEED
+            self.rect.center = self.pos
+        else:
+            self.timeSince += self.game.dt
+            if self.timeSince > 1500:
+                self.attackTarget()
+                self.timeSince = 0
+            self.rect.center = self.rect.center

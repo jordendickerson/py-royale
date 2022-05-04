@@ -27,12 +27,16 @@ HEIGHT = 800 #sets height of screen
 
 #Troop settings
 TROOP_SPEED = .45
+TROOP_HP = 100
+TROOP_DAMAGE = 50
 
 #King tower settings
 KING_SIZE = 75
+KING_HP = 1000
 
 #Archer Tower Settings
 ARCHER_SIZE = 75
+ARCHER_HP = 500
 
 #player properties
 PLAYER_ACC = 1
