@@ -20,6 +20,7 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.enemyTowers = pg.sprite.Group()
         self.troops = pg.sprite.Group()
+        self.arrows = pg.sprite.Group()
         #create enemy towers
         self.enemyKing = KingTower(self, WIDTH / 2, 100, (self.all_sprites, self.enemyTowers))
         self.enemyArcher1 = ArcherTower(self, WIDTH / 4, 155, (self.all_sprites, self.enemyTowers))

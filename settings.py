@@ -38,6 +38,9 @@ KING_HP = 1000
 ARCHER_SIZE = 75
 ARCHER_HP = 500
 
+#Arrow settings
+ARROW_SPEED = 2
+
 #player properties
 PLAYER_ACC = 1
 PLAYER_FRICTION = -.12
