@@ -25,9 +25,14 @@ FONT_NAME = 'arial'
 WIDTH = 450 #sets width of screen
 HEIGHT = 800 #sets height of screen
 
-# Player Size
-PLAYER_HEIGHT = 32
-PLAYER_WIDTH = 32
+#Troop settings
+TROOP_SPEED = .45
+
+#King tower settings
+KING_SIZE = 75
+
+#Archer Tower Settings
+ARCHER_SIZE = 75
 
 #player properties
 PLAYER_ACC = 1
