@@ -19,10 +19,13 @@ class Game:
         #create sprite groups
         self.all_sprites = pg.sprite.Group()
         self.enemyTowers = pg.sprite.Group()
+        self.troops = pg.sprite.Group()
         #create enemy towers
         self.enemyKing = KingTower(self, WIDTH / 2, 100, (self.all_sprites, self.enemyTowers))
         self.enemyArcher1 = ArcherTower(self, WIDTH / 4, 155, (self.all_sprites, self.enemyTowers))
         self.enemyArcher2 = ArcherTower(self, WIDTH * 3/4, 155, (self.all_sprites, self.enemyTowers))
+        #create troops
+        self.troop = Troop(self, WIDTH / 3, 450, (self.all_sprites, self.troops))
         self.run()
 
     def run(self):
