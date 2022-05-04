@@ -22,8 +22,8 @@ TITLE = "Runner" #Sets title
 FONT_NAME = 'arial'
 
 # screen size
-WIDTH = 480 #sets width of screen
-HEIGHT = 600 #sets height of screen
+WIDTH = 450 #sets width of screen
+HEIGHT = 800 #sets height of screen
 
 # Player Size
 PLAYER_HEIGHT = 32

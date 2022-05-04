@@ -1,3 +1,4 @@
+#imports
 from settings import *
 from sprites import *
 import pygame as pg
@@ -10,12 +11,18 @@ class Game:
         pg.mixer.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         pg.display.set_caption(TITLE)
+        self.bg = pg.image.load(os.path.join(img_Folder, 'background-temp.png'))
         self.clock = pg.time.Clock()
         self.running = True
 
     def new(self):
+        #create sprite groups
         self.all_sprites = pg.sprite.Group()
-        self.platforms = pg.sprite.Group()
+        self.enemyTowers = pg.sprite.Group()
+        #create enemy towers
+        self.enemyKing = KingTower(self, WIDTH / 2, 100, (self.all_sprites, self.enemyTowers))
+        self.enemyArcher1 = ArcherTower(self, WIDTH / 4, 155, (self.all_sprites, self.enemyTowers))
+        self.enemyArcher2 = ArcherTower(self, WIDTH * 3/4, 155, (self.all_sprites, self.enemyTowers))
         self.run()
 
     def run(self):
@@ -39,7 +46,7 @@ class Game:
 
     def draw(self):
         #Draw sprites
-        self.screen.fill(BLACK)
+        self.screen.blit(self.bg, (0,0))
         self.all_sprites.draw(self.screen)
 
         #after drawing, flip display
