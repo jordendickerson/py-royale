@@ -1,5 +1,6 @@
 # Game Settings
 import random
+import pygame as pg
 import os
 
 #set directories
@@ -7,6 +8,8 @@ game_Folder = os.path.dirname(__file__)
 assets_Folder = os.path.join(game_Folder, "assets")
 img_Folder = os.path.join(assets_Folder, "imgs")
 audio_Folder = os.path.join(assets_Folder, "audio")
+
+font_name = pg.font.match_font('Impact')
 
 print(img_Folder)
 
@@ -38,9 +41,10 @@ KING_HP = 1000
 ARCHER_SIZE = 75
 ARCHER_HP = 500
 
+
 #Arrow settings
 ARROW_SPEED = 4
-ARROW_DAMAGE = 25
+ARROW_DAMAGE = 15
 
 #player properties
 PLAYER_ACC = 1

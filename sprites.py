@@ -21,6 +21,15 @@ def move(self, speed):
         else:
             self.pos.y += speed
     self.rect.center = self.pos
+
+def draw_text(surf, text, size, color, x, y):
+    font = pg.font.Font(font_name, size)
+    text_surf = font.render(text,True,color)
+    text_rect = text_surf.get_rect()
+    text_rect.midtop = (x,y)
+    surf.blit(text_surf, text_rect)
+
+
 class KingTower(pg.sprite.Sprite):
     def __init__(self, game, x, y, group):
         self.groups = game.all_sprites, group
@@ -32,11 +41,58 @@ class KingTower(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.pos = vec(x, y)
         self.rect.center = (self.pos)
-
         self.hp = KING_HP
+        self.target = None
+        self.targetInRange = False
+        self.timeSince = 0
+
+    def findTarget(self):
+        if len(self.game.troops) > 0:
+            troops = []
+            troopDist = []
+            # add distance from all troops to a list
+            for troop in self.game.troops:
+                dist = math.sqrt((self.pos.x - troop.pos.x) ** 2 + (self.pos.y - troop.pos.y) ** 2)
+                troops.append(troop)
+                troopDist.append(dist)
+            # set minimum distance
+            minDist = troopDist.index(min(troopDist))
+            # set target to closest troop
+            self.target = troops[minDist]
+            # check if target is close enough to shoot
+            targetDist = math.sqrt((self.target.pos.x - self.pos.x) ** 2 + (self.target.pos.y - self.pos.y) ** 2)
+            if targetDist < 175:
+                self.targetInRange = True
+            else:
+                self.targetInRange = False
+        else:
+            self.target = None
+            self.targetInRange = False
+
+    def shoot(self):
+        Arrow(self.game, self.pos.x, self.pos.y, self.game.arrows, self.target)
+    def draw_health(self, screen):
+        if self.hp > KING_HP * .6:
+            color = GREEN
+        elif self.hp > KING_HP * .3:
+            color = YELLOW
+        else:
+            color = RED
+        #set width of health bar and draw it
+        width = self.rect.width / 2
+        self.health_bar = pg.Rect(18.75,0,width,10)
+        #draw bar
+        pg.draw.rect(self.image, color, self.health_bar)
+        draw_text(screen, str(self.hp), 10, BLACK, self.rect.x + (KING_SIZE / 2), self.rect.y - 2)
 
     def update(self):
-        #kill if hp runs out
+        self.findTarget()
+        if self.targetInRange and len(self.game.enemyTowers) < 3:
+            self.timeSince += self.game.dt
+            if self.timeSince > 1500:
+                self.timeSince = 0
+                self.shoot()
+        # kill if hp runs out
         if self.hp <= 0:
             self.kill()
 
@@ -46,7 +102,7 @@ class ArcherTower(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((ARCHER_SIZE, ARCHER_SIZE))
-        self.image.fill(GREEN)
+        self.image.fill(BLUE)
         self.width = ARCHER_SIZE
         self.rect = self.image.get_rect()
         self.pos = vec(x, y)
@@ -57,27 +113,44 @@ class ArcherTower(pg.sprite.Sprite):
         self.timeSince = 0
 
     def findTarget(self):
-        troops = []
-        troopDist = []
-        #add distance from all troops to a list
-        for troop in self.game.troops:
-            dist = math.sqrt((self.pos.x - troop.pos.x) ** 2 + (self.pos.y - troop.pos.y) ** 2)
-            troops.append(troop)
-            troopDist.append(dist)
-        #set minimum distance
-        minDist = troopDist.index(min(troopDist))
-        #set target to closest troop
-        self.target = troops[minDist]
-        #check if target is close enough to shoot
-        targetDist = math.sqrt((self.target.pos.x - self.pos.x) ** 2 + (self.target.pos.y - self.pos.y) ** 2)
-        if targetDist < 175:
-            self.targetInRange = True
+        if len(self.game.troops) > 0:
+            troops = []
+            troopDist = []
+            #add distance from all troops to a list
+            for troop in self.game.troops:
+                dist = math.sqrt((self.pos.x - troop.pos.x) ** 2 + (self.pos.y - troop.pos.y) ** 2)
+                troops.append(troop)
+                troopDist.append(dist)
+            #set minimum distance
+            minDist = troopDist.index(min(troopDist))
+            #set target to closest troop
+            self.target = troops[minDist]
+            #check if target is close enough to shoot
+            targetDist = math.sqrt((self.target.pos.x - self.pos.x) ** 2 + (self.target.pos.y - self.pos.y) ** 2)
+            if targetDist < 175:
+                self.targetInRange = True
+            else:
+                self.targetInRange = False
         else:
-            pass
+            self.target = None
             self.targetInRange = False
 
     def shoot(self):
         Arrow(self.game, self.pos.x, self.pos.y, self.game.arrows, self.target)
+
+    def draw_health(self, screen):
+        if self.hp > ARCHER_HP * .6:
+            color = GREEN
+        elif self.hp > ARCHER_HP * .3:
+            color = YELLOW
+        else:
+            color = RED
+        #set width of health bar and draw it
+        width = self.rect.width / 2
+        self.health_bar = pg.Rect(18.75,0,width,10)
+        #draw bar
+        pg.draw.rect(self.image, color, self.health_bar)
+        draw_text(screen, str(self.hp), 10, BLACK, self.rect.x + (ARCHER_SIZE / 2), self.rect.y - 2)
 
     def update(self):
         self.findTarget()
@@ -135,6 +208,21 @@ class Troop(pg.sprite.Sprite):
             self.target.hp -= self.damage
             print(self.target.hp)
 
+    #draw health bar
+    def draw_health(self, screen):
+        if self.hp > TROOP_HP * .6:
+            color = GREEN
+        elif self.hp > TROOP_HP * .3:
+            color = YELLOW
+        else:
+            color = RED
+        #set width of health bar and draw it
+        width = self.rect.width / 1.5
+        self.health_bar = pg.Rect(5,0,width,5)
+        #draw bar
+        pg.draw.rect(self.image, color, self.health_bar)
+        draw_text(screen, str(self.hp), 8, WHITE, self.rect.x + 12, self.rect.y - 10)
+
     def update(self):
         self.calcDistance()
         # checks for collision with tower
@@ -150,7 +238,7 @@ class Troop(pg.sprite.Sprite):
         #check for collision with arrow
         hits = pg.sprite.spritecollide(self, self.game.arrows, True)
         if hits:
-            self.hp -= ARROW_DAMAGEgit
+            self.hp -= ARROW_DAMAGE
         # kill if hp runs out
         if self.hp <= 0:
             self.kill()

@@ -53,6 +53,16 @@ class Game:
         self.screen.blit(self.bg, (0,0))
         self.all_sprites.draw(self.screen)
 
+        # draw health bars
+        for sprite in self.all_sprites:
+            if isinstance(sprite, ArcherTower):
+                sprite.draw_health(self.screen)
+            if isinstance(sprite, KingTower):
+                sprite.draw_health(self.screen)
+            if isinstance(sprite, Troop):
+                sprite.draw_health(self.screen)
+
+
         #after drawing, flip display
         pg.display.flip()
 
