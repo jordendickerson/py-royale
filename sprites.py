@@ -250,7 +250,6 @@ class Arrow(pg.sprite.Sprite):
         self.game = game
         self.image = pg.Surface((10, 10))
         self.image.fill(BLACK)
-        self.width = ARCHER_SIZE
         self.rect = self.image.get_rect()
         self.pos = vec(x, y)
         self.rect.center = (self.pos)
@@ -258,3 +257,14 @@ class Arrow(pg.sprite.Sprite):
 
     def update(self):
         move(self, ARROW_SPEED)
+
+class CardTable(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((100,200))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.pos = vec(x,y)
+        self.rect.center = self.pos

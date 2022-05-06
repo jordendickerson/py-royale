@@ -22,11 +22,15 @@ class Game:
         self.troops = pg.sprite.Group()
         self.arrows = pg.sprite.Group()
         #create enemy towers
-        self.enemyKing = KingTower(self, WIDTH / 2, 100, (self.all_sprites, self.enemyTowers))
-        self.enemyArcher1 = ArcherTower(self, WIDTH / 4, 155, (self.all_sprites, self.enemyTowers))
-        self.enemyArcher2 = ArcherTower(self, WIDTH * 3/4, 155, (self.all_sprites, self.enemyTowers))
+        self.enemyKing = KingTower(self, WIDTH / 2, 100, (self.enemyTowers))
+        self.enemyArcher1 = ArcherTower(self, WIDTH / 4, 155, (self.enemyTowers))
+        self.enemyArcher2 = ArcherTower(self, WIDTH * 3/4, 155, (self.enemyTowers))
         #create troops
-        self.troop = Troop(self, WIDTH / 3, 450, (self.all_sprites, self.troops))
+        self.troop = Troop(self, WIDTH / 3, 450, (self.troops))
+
+        #create card table and cards
+        self.cardTable = CardTable(self, 118, 685)
+
         self.run()
 
     def run(self):
