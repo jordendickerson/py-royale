@@ -39,7 +39,8 @@ ARCHER_SIZE = 75
 ARCHER_HP = 500
 
 #Arrow settings
-ARROW_SPEED = 2
+ARROW_SPEED = 4
+ARROW_DAMAGE = 25
 
 #player properties
 PLAYER_ACC = 1

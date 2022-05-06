@@ -54,6 +54,7 @@ class ArcherTower(pg.sprite.Sprite):
         self.hp = ARCHER_HP
         self.target = None
         self.targetInRange = False
+        self.timeSince = 0
 
     def findTarget(self):
         troops = []
@@ -81,7 +82,10 @@ class ArcherTower(pg.sprite.Sprite):
     def update(self):
         self.findTarget()
         if self.targetInRange:
-            self.shoot()
+            self.timeSince += self.game.dt
+            if self.timeSince > 1500:
+                self.timeSince = 0
+                self.shoot()
         #kill if hp runs out
         if self.hp <= 0:
             self.kill()
@@ -143,6 +147,10 @@ class Troop(pg.sprite.Sprite):
                 self.attackTarget()
                 self.timeSince = 0
             self.rect.center = self.rect.center
+        #check for collision with arrow
+        hits = pg.sprite.spritecollide(self, self.game.arrows, True)
+        if hits:
+            self.hp -= ARROW_DAMAGEgit
         # kill if hp runs out
         if self.hp <= 0:
             self.kill()
