@@ -29,9 +29,11 @@ WIDTH = 450 #sets width of screen
 HEIGHT = 800 #sets height of screen
 
 #Troop settings
+TROOP_SIZE = 25
 TROOP_SPEED = .45
 TROOP_HP = 100
 TROOP_DAMAGE = 50
+AVOID_RADIUS = 20
 
 #King tower settings
 KING_SIZE = 75

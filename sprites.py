@@ -169,7 +169,7 @@ class Troop(pg.sprite.Sprite):
         self.enemyTowers = game.enemyTowers
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((25, 25))
+        self.image = pg.Surface((TROOP_SIZE, TROOP_SIZE))
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.pos = vec(x, y)
@@ -201,6 +201,13 @@ class Troop(pg.sprite.Sprite):
         except:
             print('no')
 
+    def avoid_troops(self):
+        for troop in self.game.troops:
+            if troop != self:
+                dist = self.pos - troop.pos
+                if 0 < dist.length() < AVOID_RADIUS:
+                    self.pos += dist.normalize()
+
     #attack target if colliding
     def attackTarget(self):
         hits = pg.sprite.spritecollide(self, self.game.enemyTowers, False)
@@ -225,6 +232,7 @@ class Troop(pg.sprite.Sprite):
 
     def update(self):
         self.calcDistance()
+        self.avoid_troops()
         # checks for collision with tower
         hits = pg.sprite.spritecollide(self, self.enemyTowers, False)
         if not hits:
@@ -263,8 +271,61 @@ class CardTable(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((100,200))
+        self.image = pg.Surface((450,150))
         self.image.fill(RED)
         self.rect = self.image.get_rect()
         self.pos = vec(x,y)
-        self.rect.center = self.pos
+        self.rect.topleft = self.pos
+        self.check1 = Card(self.game, x + 10, y + 15, self.game.cardChecks, BLUE)
+        self.check2 = Card(self.game, x + 125, y + 15, self.game.cardChecks, BLUE)
+        self.check3 = Card(self.game, x + 240, y + 15, self.game.cardChecks, BLUE)
+        self.check4 = Card(self.game, x + 355, y + 15, self.game.cardChecks, BLUE)
+
+class Card(pg.sprite.Sprite):
+    def __init__(self, game, x, y, groups, color):
+        self.groups = game.all_sprites, groups
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((90, 125))
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.pos = vec(x, y)
+        self.rect.topleft = self.pos
+        self.color = color
+
+        self.originalX = x
+        self.originalY = y
+        self.dragging = False
+        self.spawn = False
+
+    def update(self):
+        pos = pg.mouse.get_pos()
+        if self.dragging:
+            self.image = pg.Surface((TROOP_SIZE, TROOP_SIZE))
+            self.image.fill(BLACK)
+            self.image.set_alpha(100)
+            self.rect = self.image.get_rect()
+            self.rect.centerx = pos[0]
+            self.rect.centery = pos[1]
+        else:
+            self.image = pg.Surface((90, 125))
+            self.image.fill(self.color)
+            self.rect = self.image.get_rect()
+            self.rect.topleft = (self.originalX, self.originalY)
+            self.image.set_alpha(255)
+        if self.spawn:
+            self.kill()
+            Troop(self.game, pos[0], pos[1], self.game.troops)
+
+class Bound(pg.sprite.Sprite):
+    def __init__(self, game, x, y, w, h, groups):
+        self.groups = game.all_sprites, groups
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((w, h))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.pos = vec(x, y)
+        self.rect.topleft = self.pos
+        self.image.set_alpha(0)
+
