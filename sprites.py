@@ -52,7 +52,7 @@ class KingTower(pg.sprite.Sprite):
             troops = []
             troopDist = []
             # add distance from all troops to a list
-            for troop in self.game.troops:
+            for troop in self.targetGroup:
                 dist = math.sqrt((self.pos.x - troop.pos.x) ** 2 + (self.pos.y - troop.pos.y) ** 2)
                 troops.append(troop)
                 troopDist.append(dist)
@@ -119,7 +119,7 @@ class ArcherTower(pg.sprite.Sprite):
             troops = []
             troopDist = []
             #add distance from all troops to a list
-            for troop in self.game.troops:
+            for troop in self.targetGroup:
                 dist = math.sqrt((self.pos.x - troop.pos.x) ** 2 + (self.pos.y - troop.pos.y) ** 2)
                 troops.append(troop)
                 troopDist.append(dist)
@@ -213,7 +213,7 @@ class Troop(pg.sprite.Sprite):
 
     #attack target if colliding
     def attackTarget(self):
-        hits = pg.sprite.spritecollide(self, self.game.enemyTowers, False)
+        hits = pg.sprite.spritecollide(self, self.targetGroup, False)
         if hits:
             self.target.hp -= self.damage
             print(self.target.hp)
@@ -237,7 +237,7 @@ class Troop(pg.sprite.Sprite):
         self.calcDistance()
         self.avoid_troops()
         # checks for collision with tower
-        hits = pg.sprite.spritecollide(self, self.enemyTowers, False)
+        hits = pg.sprite.spritecollide(self, self.targetGroup, False)
         if not hits:
             move(self, TROOP_SPEED)
         else:
@@ -329,7 +329,7 @@ class Card(pg.sprite.Sprite):
             self.image.set_alpha(255)
         if self.spawn:
             self.kill()
-            Troop(self.game, pos[0], pos[1], self.game.troops, self.game.enemyTowers)
+            Troop(self.game, pos[0], pos[1], self.game.troops, self.game.enemies)
 
 class Bound(pg.sprite.Sprite):
     def __init__(self, game, x, y, w, h, groups):

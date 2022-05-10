@@ -20,20 +20,26 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.enemyTowers = pg.sprite.Group()
         self.enemyTroops = pg.sprite.Group()
+        self.enemies = pg.sprite.Group()
         self.playerTowers = pg.sprite.Group()
         self.troops = pg.sprite.Group()
         self.arrows = pg.sprite.Group()
         self.cardChecks = pg.sprite.Group()
         self.cards = pg.sprite.Group()
         self.bounds = pg.sprite.Group()
+
         #create enemy towers
-        self.enemyKing = KingTower(self, WIDTH / 2, 100, (self.enemyTowers), self.troops)
-        self.enemyArcher1 = ArcherTower(self, WIDTH / 4, 155, (self.enemyTowers), self.troops)
-        self.enemyArcher2 = ArcherTower(self, WIDTH * 3/4, 155, (self.enemyTowers), self.troops)
+        self.enemyKing = KingTower(self, WIDTH / 2, 100, (self.enemyTowers, self.enemies), self.troops)
+        self.enemyArcher1 = ArcherTower(self, WIDTH / 4, 155, (self.enemyTowers, self.enemies), self.troops)
+        self.enemyArcher2 = ArcherTower(self, WIDTH * 3/4, 155, (self.enemyTowers, self.enemies), self.troops)
         #create enemy bounds
         self.kingBound = Bound(self, 0, 0, WIDTH, 200, (self.bounds))
         self.archerBound1 = Bound(self, 0, 200, WIDTH / 2, 150, (self.bounds))
         self.archerBound2 = Bound(self, WIDTH / 2, 200, WIDTH / 2, 150, (self.bounds))
+        #enemy troop spawning funciton values
+        self.enemyTimer = 0
+        self.elixirTimer = 0
+        self.enemyElixir = 10
 
         #create player towers
         self.playerKing = KingTower(self, WIDTH / 2, HEIGHT - 250, (self.playerTowers), self.enemyTroops)
@@ -54,6 +60,8 @@ class Game:
             self.draw()
 
     def update(self):
+        #spawn an enemy troop on a timer
+        self.spawnEnemyTroop()
         #if cards list is less than 4 and card checks are not colliding with anything, spawn a card
         for check in self.cardChecks:
             hits = pg.sprite.spritecollide(check, self.cards, False)
@@ -116,6 +124,19 @@ class Game:
 
         #after drawing, flip display
         pg.display.flip()
+
+    def spawnEnemyTroop(self):
+        self.enemyTimer += self.dt
+        self.elixirTimer += self.dt
+        if self.enemyTimer > 2000:
+            if self.enemyElixir < 10:
+                self.enemyElixir += 1
+                print(self.enemyElixir)
+            if self.enemyElixir >= 4:
+                Troop(self, random.randint(15, WIDTH - 15), 250, (self.enemies, self.enemyTroops), self.playerTowers)
+                self.enemyElixir -= 4
+                print("spawned")
+            self.enemyTimer = 0
 
     def show_start_screen(self):
         # game splash/start screen
