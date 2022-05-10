@@ -32,7 +32,7 @@ HEIGHT = 800 #sets height of screen
 TROOP_SIZE = 25
 TROOP_SPEED = .45
 TROOP_HP = 100
-TROOP_DAMAGE = 50
+TROOP_DAMAGE = 25
 AVOID_RADIUS = 20
 
 #King tower settings

@@ -73,6 +73,9 @@ class Game:
         #Update loops
         self.all_sprites.update()
 
+        if len(self.enemies) == 0:
+            self.playing = False
+
     def events(self):
         for event in pg.event.get():
             #CHECK IF MOUSE IS CLICKED
@@ -132,11 +135,9 @@ class Game:
         if self.enemyTimer > 2000:
             if self.enemyElixir < 10:
                 self.enemyElixir += 1
-                print(self.enemyElixir)
             if self.enemyElixir >= 4:
-                Troop(self, random.randint(15, WIDTH - 15), 250, (self.enemies, self.enemyTroops), self.allPlayerSprites)
+                Troop(self, random.randint(15, WIDTH - 15), 250, (self.enemies, self.enemyTroops), self.allPlayerSprites, self.enemyTowers)
                 self.enemyElixir -= 4
-                print("spawned")
             self.enemyTimer = 0
 
     def show_start_screen(self):

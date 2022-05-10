@@ -166,7 +166,7 @@ class ArcherTower(pg.sprite.Sprite):
             self.kill()
 
 class Troop(pg.sprite.Sprite):
-    def __init__(self, game, x, y, group, targetGroup):
+    def __init__(self, game, x, y, group, targetGroup, towerGroup):
         self.groups = game.all_sprites, group
         self.enemyTowers = game.enemyTowers
         pg.sprite.Sprite.__init__(self, self.groups)
@@ -184,6 +184,7 @@ class Troop(pg.sprite.Sprite):
         self.targetGroup = targetGroup
         self.target = None
         self.timeSince = 0
+        self.towerGroup = towerGroup
 
 
 
@@ -216,7 +217,6 @@ class Troop(pg.sprite.Sprite):
         hits = pg.sprite.spritecollide(self, self.targetGroup, False)
         if hits:
             self.target.hp -= self.damage
-            print(self.target.hp)
 
     #draw health bar
     def draw_health(self, screen):
@@ -236,17 +236,18 @@ class Troop(pg.sprite.Sprite):
     def update(self):
         self.calcDistance()
         self.avoid_troops()
-        # checks for collision with tower
+        # checks for collision with enemy tower
         hits = pg.sprite.spritecollide(self, self.targetGroup, False)
         if not hits:
+            #if not hitting, move
             move(self, TROOP_SPEED)
         else:
+            #attack tower on a timer
             self.timeSince += self.game.dt
             if self.timeSince > 1500:
                 self.attackTarget()
                 self.timeSince = 0
             self.rect.center = self.rect.center
-
         # kill if hp runs out
         if self.hp <= 0:
             self.kill()
@@ -265,11 +266,15 @@ class Arrow(pg.sprite.Sprite):
         self.targetGroup = targetGroup
 
     def update(self):
+        timer = 0
         move(self, ARROW_SPEED)
         # check for collision with arrow
-        hits = pg.sprite.spritecollide(self, self.targetGroup, True)
+        hits = pg.sprite.spritecollide(self, self.targetGroup, False)
         if hits:
             self.target.hp -= ARROW_DAMAGE
+            self.kill()
+        timer += self.game.dt
+        if timer > 2500:
             self.kill()
 
 class CardTable(pg.sprite.Sprite):
@@ -332,7 +337,7 @@ class Card(pg.sprite.Sprite):
             self.image.set_alpha(255)
         if self.spawn:
             self.kill()
-            Troop(self.game, pos[0], pos[1], (self.game.troops, self.game.allPlayerSprites), self.game.enemies)
+            Troop(self.game, pos[0], pos[1], (self.game.troops, self.game.allPlayerSprites), self.game.enemies, self.game.playerTowers)
 
 class Bound(pg.sprite.Sprite):
     def __init__(self, game, x, y, w, h, groups):
