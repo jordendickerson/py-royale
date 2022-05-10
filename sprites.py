@@ -71,7 +71,7 @@ class KingTower(pg.sprite.Sprite):
             self.targetInRange = False
 
     def shoot(self):
-        Arrow(self.game, self.pos.x, self.pos.y, self.game.arrows, self.target)
+        Arrow(self.game, self.pos.x, self.pos.y, self.game.arrows, self.target, self.targetGroup)
     def draw_health(self, screen):
         if self.hp > KING_HP * .6:
             color = GREEN
@@ -138,7 +138,7 @@ class ArcherTower(pg.sprite.Sprite):
             self.targetInRange = False
 
     def shoot(self):
-        Arrow(self.game, self.pos.x, self.pos.y, self.game.arrows, self.target)
+        arrow = Arrow(self.game, self.pos.x, self.pos.y, self.game.arrows, self.target, self.targetGroup)
 
     def draw_health(self, screen):
         if self.hp > ARCHER_HP * .6:
@@ -246,16 +246,13 @@ class Troop(pg.sprite.Sprite):
                 self.attackTarget()
                 self.timeSince = 0
             self.rect.center = self.rect.center
-        #check for collision with arrow
-        hits = pg.sprite.spritecollide(self, self.game.arrows, True)
-        if hits:
-            self.hp -= ARROW_DAMAGE
+
         # kill if hp runs out
         if self.hp <= 0:
             self.kill()
 
 class Arrow(pg.sprite.Sprite):
-    def __init__(self, game, x, y, group, target):
+    def __init__(self, game, x, y, group, target, targetGroup):
         self.groups = game.all_sprites, group
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -265,9 +262,15 @@ class Arrow(pg.sprite.Sprite):
         self.pos = vec(x, y)
         self.rect.center = (self.pos)
         self.target = target
+        self.targetGroup = targetGroup
 
     def update(self):
         move(self, ARROW_SPEED)
+        # check for collision with arrow
+        hits = pg.sprite.spritecollide(self, self.targetGroup, True)
+        if hits:
+            self.target.hp -= ARROW_DAMAGE
+            self.kill()
 
 class CardTable(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -329,7 +332,7 @@ class Card(pg.sprite.Sprite):
             self.image.set_alpha(255)
         if self.spawn:
             self.kill()
-            Troop(self.game, pos[0], pos[1], self.game.troops, self.game.enemies)
+            Troop(self.game, pos[0], pos[1], (self.game.troops, self.game.allPlayerSprites), self.game.enemies)
 
 class Bound(pg.sprite.Sprite):
     def __init__(self, game, x, y, w, h, groups):

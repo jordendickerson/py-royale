@@ -23,6 +23,7 @@ class Game:
         self.enemies = pg.sprite.Group()
         self.playerTowers = pg.sprite.Group()
         self.troops = pg.sprite.Group()
+        self.allPlayerSprites = pg.sprite.Group()
         self.arrows = pg.sprite.Group()
         self.cardChecks = pg.sprite.Group()
         self.cards = pg.sprite.Group()
@@ -42,9 +43,9 @@ class Game:
         self.enemyElixir = 10
 
         #create player towers
-        self.playerKing = KingTower(self, WIDTH / 2, HEIGHT - 250, (self.playerTowers), self.enemyTroops)
-        self.playerArcher1 = ArcherTower(self, WIDTH / 4, HEIGHT - 325, (self.playerTowers), self.enemyTroops)
-        self.playerArcher2 = ArcherTower(self, WIDTH * 3/4, HEIGHT - 325, (self.playerTowers), self.enemyTroops)
+        self.playerKing = KingTower(self, WIDTH / 2, HEIGHT - 250, (self.playerTowers, self.allPlayerSprites), self.enemyTroops)
+        self.playerArcher1 = ArcherTower(self, WIDTH / 4, HEIGHT - 325, (self.playerTowers, self.allPlayerSprites), self.enemyTroops)
+        self.playerArcher2 = ArcherTower(self, WIDTH * 3/4, HEIGHT - 325, (self.playerTowers, self.allPlayerSprites), self.enemyTroops)
 
         #create card table and cards
         self.cardTable = CardTable(self, 0, 650)
@@ -133,7 +134,7 @@ class Game:
                 self.enemyElixir += 1
                 print(self.enemyElixir)
             if self.enemyElixir >= 4:
-                Troop(self, random.randint(15, WIDTH - 15), 250, (self.enemies, self.enemyTroops), self.playerTowers)
+                Troop(self, random.randint(15, WIDTH - 15), 250, (self.enemies, self.enemyTroops), self.allPlayerSprites)
                 self.enemyElixir -= 4
                 print("spawned")
             self.enemyTimer = 0
