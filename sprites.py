@@ -31,7 +31,7 @@ def draw_text(surf, text, size, color, x, y):
 
 
 class KingTower(pg.sprite.Sprite):
-    def __init__(self, game, x, y, group):
+    def __init__(self, game, x, y, group, targetGroup):
         self.groups = game.all_sprites, group
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -42,12 +42,13 @@ class KingTower(pg.sprite.Sprite):
         self.pos = vec(x, y)
         self.rect.center = (self.pos)
         self.hp = KING_HP
+        self.targetGroup = targetGroup
         self.target = None
         self.targetInRange = False
         self.timeSince = 0
 
     def findTarget(self):
-        if len(self.game.troops) > 0:
+        if len(self.targetGroup) > 0:
             troops = []
             troopDist = []
             # add distance from all troops to a list
@@ -97,7 +98,7 @@ class KingTower(pg.sprite.Sprite):
             self.kill()
 
 class ArcherTower(pg.sprite.Sprite):
-    def __init__(self, game, x, y, group):
+    def __init__(self, game, x, y, group, targetGroup):
         self.groups = game.all_sprites, group
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -108,12 +109,13 @@ class ArcherTower(pg.sprite.Sprite):
         self.pos = vec(x, y)
         self.rect.center = (self.pos)
         self.hp = ARCHER_HP
+        self.targetGroup = targetGroup
         self.target = None
         self.targetInRange = False
         self.timeSince = 0
 
     def findTarget(self):
-        if len(self.game.troops) > 0:
+        if len(self.targetGroup) > 0:
             troops = []
             troopDist = []
             #add distance from all troops to a list
@@ -164,7 +166,7 @@ class ArcherTower(pg.sprite.Sprite):
             self.kill()
 
 class Troop(pg.sprite.Sprite):
-    def __init__(self, game, x, y, group):
+    def __init__(self, game, x, y, group, targetGroup):
         self.groups = game.all_sprites, group
         self.enemyTowers = game.enemyTowers
         pg.sprite.Sprite.__init__(self, self.groups)
@@ -179,6 +181,7 @@ class Troop(pg.sprite.Sprite):
 
         self.hp = TROOP_HP
         self.damage = TROOP_DAMAGE
+        self.targetGroup = targetGroup
         self.target = None
         self.timeSince = 0
 
@@ -186,18 +189,18 @@ class Troop(pg.sprite.Sprite):
 
     #calculate the distance between troop and towers and choose closest one
     def calcDistance(self):
-        towers = []
-        towerDist = []
+        targets = []
+        targetDist = []
         #go through every tower in the enemy towers group
-        for tower in self.enemyTowers:
+        for tower in self.targetGroup:
             dist = math.sqrt((self.pos.x - tower.pos.x)**2 + (self.pos.y - tower.pos.y)**2)
-            towerDist.append(dist) #append the distance from the tower to the tower distance list
-            towers.append(tower) #append the tower to the towers list
+            targetDist.append(dist) #append the distance from the tower to the tower distance list
+            targets.append(tower) #append the tower to the towers list
         try:
             #find the index of closest tower in towers list
-            minIndex = towerDist.index(min(towerDist))
+            minIndex = targetDist.index(min(targetDist))
             #set target to the minIndex from towers
-            self.target = towers[minIndex]
+            self.target = targets[minIndex]
         except:
             print('no')
 
@@ -326,7 +329,7 @@ class Card(pg.sprite.Sprite):
             self.image.set_alpha(255)
         if self.spawn:
             self.kill()
-            Troop(self.game, pos[0], pos[1], self.game.troops)
+            Troop(self.game, pos[0], pos[1], self.game.troops, self.game.enemyTowers)
 
 class Bound(pg.sprite.Sprite):
     def __init__(self, game, x, y, w, h, groups):

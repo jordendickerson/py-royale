@@ -19,19 +19,26 @@ class Game:
         #create sprite groups
         self.all_sprites = pg.sprite.Group()
         self.enemyTowers = pg.sprite.Group()
+        self.enemyTroops = pg.sprite.Group()
+        self.playerTowers = pg.sprite.Group()
         self.troops = pg.sprite.Group()
         self.arrows = pg.sprite.Group()
         self.cardChecks = pg.sprite.Group()
         self.cards = pg.sprite.Group()
         self.bounds = pg.sprite.Group()
         #create enemy towers
-        self.enemyKing = KingTower(self, WIDTH / 2, 100, (self.enemyTowers))
-        self.enemyArcher1 = ArcherTower(self, WIDTH / 4, 155, (self.enemyTowers))
-        self.enemyArcher2 = ArcherTower(self, WIDTH * 3/4, 155, (self.enemyTowers))
+        self.enemyKing = KingTower(self, WIDTH / 2, 100, (self.enemyTowers), self.troops)
+        self.enemyArcher1 = ArcherTower(self, WIDTH / 4, 155, (self.enemyTowers), self.troops)
+        self.enemyArcher2 = ArcherTower(self, WIDTH * 3/4, 155, (self.enemyTowers), self.troops)
         #create enemy bounds
         self.kingBound = Bound(self, 0, 0, WIDTH, 200, (self.bounds))
         self.archerBound1 = Bound(self, 0, 200, WIDTH / 2, 150, (self.bounds))
         self.archerBound2 = Bound(self, WIDTH / 2, 200, WIDTH / 2, 150, (self.bounds))
+
+        #create player towers
+        self.playerKing = KingTower(self, WIDTH / 2, HEIGHT - 250, (self.playerTowers), self.enemyTroops)
+        self.playerArcher1 = ArcherTower(self, WIDTH / 4, HEIGHT - 325, (self.playerTowers), self.enemyTroops)
+        self.playerArcher2 = ArcherTower(self, WIDTH * 3/4, HEIGHT - 325, (self.playerTowers), self.enemyTroops)
 
         #create card table and cards
         self.cardTable = CardTable(self, 0, 650)
@@ -78,7 +85,7 @@ class Game:
                     #IF CARD IS IN A SPAWNABLE ZONE, SPAWN TROOP
                     hits = pg.sprite.spritecollide(card, self.cardChecks, False)
                     inBounds = pg.sprite.spritecollide(card, self.bounds, False)
-                    if not hits and not inBounds and self.cardTable.elixir > 4:
+                    if not hits and not inBounds and self.cardTable.elixir >= 4:
                         card.spawn = True
                         self.cardTable.elixir -= 4
                 for bound in self.bounds:
