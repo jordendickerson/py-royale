@@ -276,13 +276,24 @@ class CardTable(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.pos = vec(x,y)
         self.rect.topleft = self.pos
-        self.check1 = Card(self.game, x + 10, y + 15, self.game.cardChecks, BLUE)
-        self.check2 = Card(self.game, x + 125, y + 15, self.game.cardChecks, BLUE)
-        self.check3 = Card(self.game, x + 240, y + 15, self.game.cardChecks, BLUE)
-        self.check4 = Card(self.game, x + 355, y + 15, self.game.cardChecks, BLUE)
+        self.check1 = Card(self.game, x + 10, y + 15, self.game.cardChecks, BLUE, self)
+        self.check2 = Card(self.game, x + 125, y + 15, self.game.cardChecks, BLUE, self)
+        self.check3 = Card(self.game, x + 240, y + 15, self.game.cardChecks, BLUE, self)
+        self.check4 = Card(self.game, x + 355, y + 15, self.game.cardChecks, BLUE, self)
+        self.elixir = 10
+        self.timer = 0
+
+    def drawElixir(self, screen):
+        draw_text(screen, "Elixir: " + str(self.elixir), 24, BLACK, self.pos.x + 45, self.pos.y - 35)
+    def update(self):
+        self.timer += self.game.dt
+        if self.timer > 2000:
+            if self.elixir < 10:
+                self.elixir += 1
+            self.timer = 0
 
 class Card(pg.sprite.Sprite):
-    def __init__(self, game, x, y, groups, color):
+    def __init__(self, game, x, y, groups, color, cardTable):
         self.groups = game.all_sprites, groups
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game

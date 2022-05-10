@@ -32,9 +32,6 @@ class Game:
         self.kingBound = Bound(self, 0, 0, WIDTH, 200, (self.bounds))
         self.archerBound1 = Bound(self, 0, 200, WIDTH / 2, 150, (self.bounds))
         self.archerBound2 = Bound(self, WIDTH / 2, 200, WIDTH / 2, 150, (self.bounds))
-        #create troops
-        self.troop = Troop(self, WIDTH / 3, 450, (self.troops))
-        self.troop2 = Troop(self, WIDTH / 3 + 20, 450, (self.troops))
 
         #create card table and cards
         self.cardTable = CardTable(self, 0, 650)
@@ -54,7 +51,7 @@ class Game:
         for check in self.cardChecks:
             hits = pg.sprite.spritecollide(check, self.cards, False)
             if not hits and len(self.cards) < 4:
-                Card(self, check.rect.x, check.rect.y, (self.cards), YELLOW)
+                Card(self, check.rect.x, check.rect.y, (self.cards), YELLOW, self.cardTable)
 
 
         #Update loops
@@ -81,8 +78,9 @@ class Game:
                     #IF CARD IS IN A SPAWNABLE ZONE, SPAWN TROOP
                     hits = pg.sprite.spritecollide(card, self.cardChecks, False)
                     inBounds = pg.sprite.spritecollide(card, self.bounds, False)
-                    if not hits and not inBounds:
+                    if not hits and not inBounds and self.cardTable.elixir > 4:
                         card.spawn = True
+                        self.cardTable.elixir -= 4
                 for bound in self.bounds:
                     bound.image.set_alpha(0)
 
@@ -105,6 +103,8 @@ class Game:
                 sprite.draw_health(self.screen)
             if isinstance(sprite, Troop):
                 sprite.draw_health(self.screen)
+            if isinstance(sprite, CardTable):
+                sprite.drawElixir(self.screen)
 
 
         #after drawing, flip display
