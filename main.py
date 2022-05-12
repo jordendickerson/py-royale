@@ -14,6 +14,47 @@ class Game:
         self.bg = pg.image.load(os.path.join(img_Folder, 'background-temp.png'))
         self.clock = pg.time.Clock()
         self.running = True
+        self.winning = False
+
+    def wait_for_key(self):
+        pg.event.wait()
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    waiting = False
+                    self.running = False
+                if event.type == pg.KEYUP:
+                    waiting = False
+
+    def draw_text(self, text, font_name, size, color, x, y, align="nw"):
+        font = pg.font.Font(font_name, size)
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        if align == "nw":
+            text_rect.topleft = (x, y)
+        if align == "ne":
+            text_rect.topright = (x, y)
+        if align == "sw":
+            text_rect.bottomleft = (x, y)
+        if align == "se":
+            text_rect.bottomright = (x, y)
+        if align == "n":
+            text_rect.midtop = (x, y)
+        if align == "s":
+            text_rect.midbottom = (x, y)
+        if align == "e":
+            text_rect.midright = (x, y)
+        if align == "w":
+            text_rect.midleft = (x, y)
+        if align == "center":
+            text_rect.center = (x, y)
+        self.screen.blit(text_surface, text_rect)
+
+    def load_data(self):
+        # fonts
+        self.title_font = os.path.join(assets_Folder, 'You Blockhead.ttf')
 
     def new(self):
         #create sprite groups
@@ -30,6 +71,7 @@ class Game:
         self.bounds = pg.sprite.Group()
 
         #create enemy towers
+        self.enemyKingAlive = True
         self.enemyKing = KingTower(self, WIDTH / 2, 100, (self.enemyTowers, self.enemies), self.troops)
         self.enemyArcher1 = ArcherTower(self, WIDTH / 4, 155, (self.enemyTowers, self.enemies), self.troops)
         self.enemyArcher2 = ArcherTower(self, WIDTH * 3/4, 155, (self.enemyTowers, self.enemies), self.troops)
@@ -43,12 +85,19 @@ class Game:
         self.enemyElixir = 10
 
         #create player towers
+        self.playerKingAlive = True
         self.playerKing = KingTower(self, WIDTH / 2, HEIGHT - 250, (self.playerTowers, self.allPlayerSprites), self.enemyTroops)
         self.playerArcher1 = ArcherTower(self, WIDTH / 4, HEIGHT - 325, (self.playerTowers, self.allPlayerSprites), self.enemyTroops)
         self.playerArcher2 = ArcherTower(self, WIDTH * 3/4, HEIGHT - 325, (self.playerTowers, self.allPlayerSprites), self.enemyTroops)
+        self.playerTowerList = []
+        for tower in self.playerTowers:
+            self.playerTowerList.append(tower)
+        print(self.playerTowerList)
 
         #create card table and cards
         self.cardTable = CardTable(self, 0, 650)
+
+
 
         self.run()
 
@@ -61,6 +110,13 @@ class Game:
             self.draw()
 
     def update(self):
+        if not self.playerKingAlive:
+            self.winning = False
+            self.playing = False
+        if not self.enemyKingAlive:
+            self.winning = True
+            self.playing = False
+
         #spawn an enemy troop on a timer
         self.spawnEnemyTroop()
         #if cards list is less than 4 and card checks are not colliding with anything, spawn a card
@@ -68,6 +124,7 @@ class Game:
             hits = pg.sprite.spritecollide(check, self.cards, False)
             if not hits and len(self.cards) < 4:
                 Card(self, check.rect.x, check.rect.y, (self.cards), YELLOW, self.cardTable)
+
 
 
         #Update loops
@@ -141,12 +198,29 @@ class Game:
             self.enemyTimer = 0
 
     def show_start_screen(self):
+        self.load_data()
         # game splash/start screen
-        pass
+        self.screen.fill(BLACK)
+        self.draw_text("Py Royale", self.title_font, 50, YELLOW,
+                       WIDTH / 2, HEIGHT / 2, align="center")
+        self.draw_text("Press any key to start", self.title_font, 25, WHITE,
+                       WIDTH / 2, HEIGHT * 5/8, align="center")
+        pg.display.flip()
+        self.wait_for_key()
 
     def show_go_screen(self):
+        if self.winning:
+            self.go_message = "You win!"
+        else:
+            self.go_message = "You lose!"
         # game over/continue
-        pass
+        self.screen.fill(BLACK)
+        self.draw_text(self.go_message, self.title_font, 50, RED,
+                       WIDTH / 2, HEIGHT / 2, align="center")
+        self.draw_text("Press any key to play again", self.title_font, 25, WHITE,
+                       WIDTH / 2, HEIGHT * 5/8, align="center")
+        pg.display.flip()
+        self.wait_for_key()
 
 g = Game()
 g.show_start_screen()

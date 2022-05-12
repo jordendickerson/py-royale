@@ -95,6 +95,10 @@ class KingTower(pg.sprite.Sprite):
                 self.shoot()
         # kill if hp runs out
         if self.hp <= 0:
+            if self.rect.y > WIDTH / 2:
+                self.game.playerKingAlive = False
+            else:
+                self.game.enemyKingAlive = False
             self.kill()
 
 class ArcherTower(pg.sprite.Sprite):
