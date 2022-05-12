@@ -88,7 +88,7 @@ class KingTower(pg.sprite.Sprite):
 
     def update(self):
         self.findTarget()
-        if self.targetInRange and len(self.game.enemyTowers) < 3:
+        if self.targetInRange and len(self.targetGroup) < 3:
             self.timeSince += self.game.dt
             if self.timeSince > 1500:
                 self.timeSince = 0
