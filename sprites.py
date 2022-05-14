@@ -291,15 +291,15 @@ class CardTable(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.pos = vec(x,y)
         self.rect.topleft = self.pos
-        self.check1 = Card(self.game, x + 10, y + 15, self.game.cardChecks, BLUE, self)
-        self.check2 = Card(self.game, x + 125, y + 15, self.game.cardChecks, BLUE, self)
-        self.check3 = Card(self.game, x + 240, y + 15, self.game.cardChecks, BLUE, self)
-        self.check4 = Card(self.game, x + 355, y + 15, self.game.cardChecks, BLUE, self)
+        self.check1 = CardCheck(self.game, x + 10, y + 15, self.game.cardChecks, BLUE, self)
+        self.check2 = CardCheck(self.game, x + 125, y + 15, self.game.cardChecks, BLUE, self)
+        self.check3 = CardCheck(self.game, x + 240, y + 15, self.game.cardChecks, BLUE, self)
+        self.check4 = CardCheck(self.game, x + 355, y + 15, self.game.cardChecks, BLUE, self)
         self.elixir = 10
         self.timer = 0
 
     def drawElixir(self, screen):
-        draw_text(screen, "Elixir: " + str(self.elixir), 24, BLACK, self.pos.x + 45, self.pos.y - 35)
+        draw_text(screen, "Elixir: " + str(self.elixir), 24, PURPLE, self.rect.width / 2, self.pos.y - 35)
     def update(self):
         self.timer += self.game.dt
         if self.timer > 2000:
@@ -308,12 +308,44 @@ class CardTable(pg.sprite.Sprite):
             self.timer = 0
 
 class Card(pg.sprite.Sprite):
+    def __init__(self, game, x, y, groups, cardTable):
+        self.groups = game.all_sprites, groups
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.image.load(os.path.join(img_Folder, 'card.png'))
+        self.rect = self.image.get_rect()
+        self.pos = vec(x, y)
+        self.rect.topleft = self.pos
+
+        self.originalX = x
+        self.originalY = y
+        self.dragging = False
+        self.spawn = False
+
+    def update(self):
+        pos = pg.mouse.get_pos()
+        if self.dragging:
+            self.image = pg.Surface((TROOP_SIZE, TROOP_SIZE))
+            self.image.fill(BLACK)
+            self.image.set_alpha(100)
+            self.rect = self.image.get_rect()
+            self.rect.centerx = pos[0]
+            self.rect.centery = pos[1]
+        else:
+            self.image = pg.image.load(os.path.join(img_Folder, 'card.png'))
+            self.rect = self.image.get_rect()
+            self.rect.topleft = (self.originalX, self.originalY)
+            self.image.set_alpha(255)
+        if self.spawn:
+            self.kill()
+            Troop(self.game, pos[0], pos[1], (self.game.troops, self.game.allPlayerSprites), self.game.enemies, self.game.playerTowers)
+
+class CardCheck(pg.sprite.Sprite):
     def __init__(self, game, x, y, groups, color, cardTable):
         self.groups = game.all_sprites, groups
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((90, 125))
-        self.image.fill(color)
+        self.image = pg.image.load(os.path.join(img_Folder, 'card.png'))
         self.rect = self.image.get_rect()
         self.pos = vec(x, y)
         self.rect.topleft = self.pos

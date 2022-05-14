@@ -11,7 +11,7 @@ class Game:
         pg.mixer.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         pg.display.set_caption(TITLE)
-        self.bg = pg.image.load(os.path.join(img_Folder, 'background-temp.png'))
+        self.bg = pg.image.load(os.path.join(img_Folder, 'background.png'))
         self.clock = pg.time.Clock()
         self.running = True
         self.winning = False
@@ -57,6 +57,7 @@ class Game:
         self.title_font = os.path.join(assets_Folder, 'You Blockhead.ttf')
 
     def new(self):
+        self.load_data()
         #create sprite groups
         self.all_sprites = pg.sprite.Group()
         self.enemyTowers = pg.sprite.Group()
@@ -92,7 +93,6 @@ class Game:
         self.playerTowerList = []
         for tower in self.playerTowers:
             self.playerTowerList.append(tower)
-        print(self.playerTowerList)
 
         #create card table and cards
         self.cardTable = CardTable(self, 0, 650)
@@ -123,7 +123,7 @@ class Game:
         for check in self.cardChecks:
             hits = pg.sprite.spritecollide(check, self.cards, False)
             if not hits and len(self.cards) < 4:
-                Card(self, check.rect.x, check.rect.y, (self.cards), YELLOW, self.cardTable)
+                Card(self, check.rect.x, check.rect.y, (self.cards), self.cardTable)
 
 
 
@@ -189,7 +189,7 @@ class Game:
     def spawnEnemyTroop(self):
         self.enemyTimer += self.dt
         self.elixirTimer += self.dt
-        if self.enemyTimer > 2000:
+        if self.enemyTimer > 2500:
             if self.enemyElixir < 10:
                 self.enemyElixir += 1
             if self.enemyElixir >= 4:
@@ -217,8 +217,10 @@ class Game:
         self.screen.fill(BLACK)
         self.draw_text(self.go_message, self.title_font, 50, RED,
                        WIDTH / 2, HEIGHT / 2, align="center")
-        self.draw_text("Press any key to play again", self.title_font, 25, WHITE,
+        self.draw_text("Press any key to", self.title_font, 25, WHITE,
                        WIDTH / 2, HEIGHT * 5/8, align="center")
+        self.draw_text("play again", self.title_font, 25, WHITE,
+                       WIDTH / 2, (HEIGHT * 5/8) + 30, align="center")
         pg.display.flip()
         self.wait_for_key()
 
