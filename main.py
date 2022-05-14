@@ -57,7 +57,6 @@ class Game:
         self.title_font = os.path.join(assets_Folder, 'You Blockhead.ttf')
 
     def new(self):
-        self.load_data()
         #create sprite groups
         self.all_sprites = pg.sprite.Group()
         self.enemyTowers = pg.sprite.Group()
@@ -97,11 +96,15 @@ class Game:
         #create card table and cards
         self.cardTable = CardTable(self, 0, 650)
 
+        #load music
+        pg.mixer.music.load(os.path.join(audio_Folder, 'bg_music.wav'))
+
 
 
         self.run()
 
     def run(self):
+        pg.mixer.music.play(loops=-1)
         self.playing = True
         while self.playing:
             self.dt = self.clock.tick(FPS)
@@ -193,7 +196,7 @@ class Game:
             if self.enemyElixir < 10:
                 self.enemyElixir += 1
             if self.enemyElixir >= 4:
-                Troop(self, random.randint(15, WIDTH - 15), 250, (self.enemies, self.enemyTroops), self.allPlayerSprites, self.enemyTowers)
+                Troop(self, random.randint(15, WIDTH - 15), 250, (self.enemies, self.enemyTroops), self.allPlayerSprites, self.enemyTowers, WHITE)
                 self.enemyElixir -= 4
             self.enemyTimer = 0
 
