@@ -53,7 +53,7 @@ class KingTower(pg.sprite.Sprite):
             troopDist = []
             # add distance from all troops to a list
             for troop in self.targetGroup:
-                dist = math.sqrt((self.pos.x - troop.pos.x) ** 2 + (self.pos.y - troop.pos.y) ** 2)
+                dist = math.sqrt((self.pos.x - troop.pos.x) ** 2 + (self.pos.y - troop.pos.y) ** 2) #euclidean distance formula
                 troops.append(troop)
                 troopDist.append(dist)
             # set minimum distance
